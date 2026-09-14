@@ -9,7 +9,8 @@ CANDIDATE -> READY -> IN_PROGRESS -> REVIEW -> DONE. READY는 승인 근거가 �
 | ID | 우선순위 | 담당 | 상태 | 목표 |
 | --- | --- | --- | --- | --- |
 | ASR-M001 | P1 | MASTER | DONE | 로컬 공용 기억 문서와 역할·승인 규칙 구축 |
-| ASR-M002 | P1 | MASTER | IN_PROGRESS | 전용 비공개 저장소 연결 및 최초 게시 |
+| ASR-M002 | P1 | MASTER | DONE | 전용 비공개 저장소 연결 및 최초 게시 |
+| ASR-M003 | P2 | MASTER | CANDIDATE | 과거 관리표 승인 이력 대조 |
 | ASR-Q001 | P1 | OUTPUT + QA | CANDIDATE | V2 Word 시각 검수 완료 |
 | ASR-Q002 | P1 | QA | CANDIDATE | 현재 PPT/PDF 다운로드 경로 운영 검증 |
 | ASR-R001 | P0 | MASTER | BLOCKED | 대표 HTML/Excel 동일 실행 pair 검증·재생성 승인 |
@@ -35,7 +36,9 @@ CANDIDATE -> READY -> IN_PROGRESS -> REVIEW -> DONE. READY는 승인 근거가 �
 - 제외: data, config, reports, .venv, tmp, 기존 handoff와 과거 완료보고서, 자격증명. .gitignore allowlist 적용.
 - 수락 기준: private, main, origin URL, 로컬/원격 SHA 일치; 제외 파일 미추적; 보호 파일 불변; 테스트 결과 기록.
 - 검증: 최초 게시 전 canonical tests, git diff --cached, ls-files, ls-remote 및 readback.
-- Commit: 최초 게시 후 아래 완료 기록에 실제 SHA 기록.
+- 최초 게시 Commit: 16e69ea2ddb5dafe48aa1820ad0fa3a442bfe6cf. main push 성공, origin/main 추적 설정.
+- 검증/수락: 142 tests passed; 원격 private 확인; 게시 91개 파일, 보호 경로 미게시; 비캐시 기준 107개 SHA-256 변경 0개. Master 문서·범위 검수 완료.
+- 완료 기록 커밋은 git log에서 확인하며, 이 task의 초기 소스 기준 SHA는 위 값을 유지한다.
 - 과거 관리표 승인 대조는 이번 저장소 생성 요청의 범위가 아니므로 별도 CANDIDATE ASR-M003으로 분리한다.
 
 ## ASR-M003 — 과거 승인 이력 대조 (CANDIDATE / MASTER / P2)

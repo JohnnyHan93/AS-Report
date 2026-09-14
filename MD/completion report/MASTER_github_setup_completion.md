@@ -2,7 +2,7 @@
 
 ## Task Summary
 
-ASR-M002: 전용 비공개 GitHub 저장소 생성과 현재 프로젝트 최초 게시. 사용자 승인: 2026-09-14 “진행”. 현재 단계: 게시 검증 진행 중.
+ASR-M002: 전용 비공개 GitHub 저장소 생성과 현재 프로젝트 최초 게시. 사용자 승인: 2026-09-14 “진행”. 상태: Completed. 최초 게시 commit 16e69ea2ddb5dafe48aa1820ad0fa3a442bfe6cf, main push 성공 및 origin/main 추적 설정. GitHub private 및 원격 파일 readback 확인.
 
 ## Modified Files
 
@@ -14,7 +14,7 @@ ARCHITECTURE.md, TASKS.md, CHANGELOG.md, README.md, MD/CURRENT_STATUS.md.
 
 ## Protected Files Check
 
-변경 전 SHA-256 스냅샷과 비캐시 파일 비교 결과는 최종 검증 기록을 따른다. Raw/Master/기존 reports/config/BAT/템플릿 수정 없음. 소스 변경 없음. .venv 변경 없음. .gitignore로 data/config/reports/.venv/tmp/과거 handoff를 제외. 기존 Johnny-AI-OS 원격 변경 없음.
+비캐시 기준 107개 SHA-256 변경 0개. 게시 파일 91개, 보호 경로 추적 0개. Raw/Master/기존 reports/config/BAT/템플릿 수정 없음. 소스 변경 없음. .venv 변경 없음. .gitignore로 data/config/reports/.venv/tmp/과거 handoff를 제외. 기존 Johnny-AI-OS 원격 변경 없음.
 
 ## Test Results
 
@@ -39,3 +39,5 @@ GitHub에 소스/테스트/템플릿/공용 문서를 게시한다. 보호 입�
 ## Recommended Next Step
 
 게시 검증 후 Master가 다음 승인 작업을 선정한다. 다른 후보 작업은 자동 착수하지 않는다.
+
+검토 메모: Windows CRLF를 보존했다. cr-at-eol 인식 후 diff --check에는 기존 input_set.py/test_input_set.py의 EOF 빈 줄 2건만 남았다. 동작과 무관한 기존 형식이므로 소스를 재포맷하지 않았다.

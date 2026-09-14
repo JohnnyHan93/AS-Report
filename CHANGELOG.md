@@ -22,3 +22,5 @@
 - 사용자 승인으로 JohnnyHan93/AS-Report private 저장소 생성. Johnny-AI-OS는 보존.
 - 현재 폴더 Git 초기화, allowlist .gitignore 적용. 업무 입력/설정/보고서/환경/임시파일 제외.
 - 최초 게시 기준 canonical tests: 142 passed. 최종 commit 및 원격 동일성은 TASKS.md 완료 기록 참조.
+
+- 게시 확인: main 초기 commit `16e69ea2ddb5dafe48aa1820ad0fa3a442bfe6cf`, 91개 파일, private 확인. 비캐시 기준 107개 파일 해시 불변. ASR-M002 완료.
