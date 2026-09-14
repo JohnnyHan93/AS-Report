@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><title>{{ slide.title }}</title>
+<style>
+* { box-sizing:border-box; letter-spacing:0; }
+body { margin:0; padding:16px; background:#e9edef; color:#24313d; font:14px/1.5 'Malgun Gothic',sans-serif; }
+.slide { width:100%; min-height:440px; aspect-ratio:16/9; background:white; border:1px solid #dae1e6;
+  border-top:6px solid #005b9f; padding:24px 28px 18px; display:flex; flex-direction:column; }
+header { display:flex; justify-content:space-between; align-items:center; gap:20px; }
+header img { width:170px; max-width:46%; height:auto; }
+.period { color:#4b5a67; font-size:12px; }
+h1 { font-size:24px; color:#123b68; margin:24px 0 20px; line-height:1.3; overflow-wrap:anywhere; }
+h2 { font-size:14px; margin:0 0 16px; }
+p { overflow-wrap:anywhere; }
+.cover { flex:1; display:flex; flex-direction:column; justify-content:center; border-left:10px solid #1b7e74; padding:12px 24px; margin:40px 0; }
+.cover h1 { font-size:30px; margin:0 0 20px; }.cover p { margin:4px 0; }
+.metrics { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:24px; }
+.metric { flex:1 1 70px; border-bottom:2px solid #dae1e6; padding-bottom:12px; font-size:12px; }
+.metric strong { display:block; color:#005b9f; font-size:24px; font-variant-numeric:tabular-nums; }
+.metric small { font-size:12px; }
+.panels { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px; }
+.panel { min-width:0; }
+.bar { display:grid; grid-template-columns:minmax(0,1fr) 70px 44px; gap:8px; align-items:center; margin-bottom:9px; font-size:12px; }
+.bar span { overflow-wrap:anywhere; }.track { background:#f0f3f5; height:6px; }.fill { background:#005b9f; height:100%; }
+.panel:nth-child(2) .fill { background:#1b7e74; }.value { text-align:right; font-variant-numeric:tabular-nums; }
+.empty { color:#687782; padding:20px 0; border-block:1px solid #dae1e6; }
+.lines { padding-left:22px; }.lines li { padding:6px 0; overflow-wrap:anywhere; }.lines li::marker { color:#1b7e74; }
+.description { font-size:12px; color:#4b5a67; margin-top:0; }
+table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px; margin-bottom:24px; }
+th,td { padding:8px 4px; border-bottom:1px solid #dae1e6; text-align:right; overflow-wrap:anywhere; }
+th { background:#e1eff9; }th:first-child,td:first-child { text-align:left; }
+footer { margin-top:auto; padding-top:20px; color:#84919b; text-align:right; font-size:11px; }
+@media(max-width:540px) {
+ body { padding:6px; }.slide { aspect-ratio:auto; padding:18px; min-height:430px; }
+ .panels { grid-template-columns:1fr; }.cover { margin:20px 0; padding-left:16px; }
+ h1 { font-size:21px; }.cover h1 { font-size:25px; }header { flex-wrap:wrap; }
+}
+</style></head><body>
+<article class="slide">
+<header><img src="data:image/png;base64,{{ logo }}" alt="DOOLIM-YASKAWA"><span class="period">{{ report.period_label }}</span></header>
+{% if slide.number == 1 %}
+<div class="cover"><h1>{{ report.title }}</h1><p>{{ report.period_range }}</p><p>선택 조건 · {{ report.filter_summary }}</p><p>생성 · {{ report.created_at }}</p></div>
+{% else %}
+<h1>{{ slide.title }}</h1>
+{% if slide.description %}<p class="description">{{ slide.description }}</p>{% endif %}
+{% if slide.metrics %}<div class="metrics">{% for metric in slide.metrics %}<div class="metric">{{ metric.label }}<strong>{{ metric.value }}<small>{{ metric.unit }}</small></strong></div>{% endfor %}</div>{% endif %}
+{% if slide.lines %}<ul class="lines">{% for line in slide.lines %}<li>{{ line }}</li>{% endfor %}</ul>{% endif %}
+{% if slide.details %}<table><thead><tr><th>업무유형</th><th>접수</th><th>비중</th><th>처리 완료</th><th>미완료</th><th>처리 완료율</th></tr></thead><tbody>
+{% for detail in slide.details %}<tr><td>{{ detail.label }}</td><td>{{ detail.received }}</td><td>{{ detail.share }}%</td><td>{{ detail.completed }}</td><td>{{ detail.incomplete }}</td><td>{{ detail.completion_rate }}%</td></tr>{% endfor %}
+</tbody></table>{% endif %}
+<div class="panels">{% for panel in slide.panels %}<section class="panel"><h2>{{ panel.title }}</h2>
+{% if panel.rows %}{% set maximum = panel.rows | map(attribute=panel.value) | max %}
+{% for row in panel.rows %}<div class="bar"><span>{{ row[panel.label] }}</span><div class="track"><div class="fill" style="width:{{ row[panel.value] / maximum * 100 if maximum else 0 }}%"></div></div><span class="value">{{ row[panel.value] }}{{ panel.unit }}</span></div>{% endfor %}
+{% else %}<p class="empty">표시할 데이터가 없습니다.</p>{% endif %}</section>{% endfor %}</div>
+{% endif %}<footer>{{ '%02d' | format(slide.number) }} / 11</footer>
+</article></body></html>

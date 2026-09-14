@@ -1,0 +1,33 @@
+# Publish only reviewed project code and shared operating documents.
+/*
+!/.gitignore
+!/AGENTS.md
+!/ARCHITECTURE.md
+!/TASKS.md
+!/CHANGELOG.md
+!/README.md
+!/pyproject.toml
+!/AS_Report.bat
+!/src/
+!/tests/
+!/MD/
+/MD/*
+!/MD/CURRENT_STATUS.md
+!/MD/completion report/
+/MD/completion report/*
+!/MD/completion report/MASTER_github_setup_completion.md
+
+# Never publish local inputs, reports, environments or diagnostic files.
+/data/
+/config/
+/reports/
+/.venv/
+/tmp/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.env
+.env.*
+*.pem
+*.key

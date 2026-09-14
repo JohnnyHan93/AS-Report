@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>{{ report.title }}</title>
+<style>
+@page { size: A4 portrait; margin: 13mm 14mm; }
+* { box-sizing: border-box; letter-spacing: 0; }
+body { margin: 0; color: #243238; background: white; font: 10pt/1.45 'Malgun Gothic', sans-serif; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 25pt; line-height: 1.25; margin: 4mm 0 3mm; }
+h2 { font-size: 16pt; margin: 3mm 0; }
+h3 { font-size: 11pt; margin-bottom: 3mm; }
+.page { break-before: page; display: flow-root; }
+.page:first-of-type { break-before: auto; }
+.running { display: flex; justify-content: space-between; gap: 5mm; border-bottom: 1.5pt solid #23776a; padding-bottom: 3mm; font-size: 9pt; color: #536467; }
+.running span { overflow-wrap: anywhere; }
+.meta { color: #536467; font-size: 9pt; overflow-wrap: anywhere; }
+.index { padding: 3mm 0; margin: 4mm 0; border-block: 1px solid #dce3e1; font-size: 9pt; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; margin: 3mm 0; }
+.metric { border-bottom: 1px solid #dce3e1; padding-bottom: 3mm; }
+.metric strong { display: block; font-size: 23pt; font-weight: 600; }
+.metric small { font-size: 10pt; padding-left: 1mm; }
+.summary { padding-left: 5mm; margin: 3mm 0; }
+.summary li { margin: 1mm 0; overflow-wrap: anywhere; }
+.note { font-size: 9pt; color: #536467; margin: 2mm 0 4mm; overflow-wrap: anywhere; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9pt; }
+thead { display: table-header-group; }
+th { background: #edf3f1; font-weight: 600; }
+td, th { padding: 1mm 1.5mm; line-height: 1.3; border-bottom: 1px solid #e1e7e5; text-align: right; overflow-wrap: anywhere; }
+td:first-child, th:first-child { text-align: left; }
+tr { break-inside: avoid; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7mm; margin: 5mm 0; }
+.panel { min-width: 0; break-inside: avoid; }
+.barrow { display: grid; grid-template-columns: minmax(0, 1fr) 32mm 9mm; gap: 2mm; align-items: center; margin: 2mm 0; font-size: 9pt; break-inside: avoid; }
+.barlabel { overflow-wrap: anywhere; }
+.track { background: #eff3f2; height: 2.5mm; }
+.fill { background: #23776a; height: 100%; }
+.value { text-align: right; font-variant-numeric: tabular-nums; }
+.empty { color: #6a7375; border-block: 1px solid #e1e7e5; padding: 5mm 0; font-size: 9pt; }
+.detail { margin: 5mm 0 6mm; padding-top: 3mm; border-top: 1px solid #c6d3cf; }
+.detail h3, .detail .stats { break-after: avoid; }
+.stats { display: flex; flex-wrap: wrap; gap: 1.5mm 4mm; font-size: 9pt; }
+.stats b { color: #17584e; }
+.detail .grid { margin: 3mm 0; gap: 6mm; }
+.months { display: flex; flex-wrap: wrap; gap: 1mm 3mm; font-size: 9pt; }
+.months span { white-space: nowrap; }
+.detail .barrow { grid-template-columns: minmax(0, 1fr) 22mm 9mm; }
+.subhead { font-size: 9pt; font-weight: 600; margin-bottom: 2mm; }
+@media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+{% macro running(label) -%}
+<header class="running"><span>A/S 현황 리포트 · {{ label }}</span><span>{{ report.period_label }}</span></header>
+{%- endmacro %}
+{% macro bars(rows, label, limit=10) -%}
+{% if rows %}
+{% set maximum = rows | map(attribute='접수 건수') | max %}
+{% for row in rows[:limit] %}
+<div class="barrow"><span class="barlabel">{{ row[label] }}</span><div class="track"><div class="fill" style="width: {{ (row['접수 건수'] / maximum * 100) if maximum else 0 }}%"></div></div><span class="value">{{ row['접수 건수'] }}</span></div>
+{% endfor %}
+{% else %}<p class="empty">표시할 데이터가 없습니다.</p>{% endif %}
+{%- endmacro %}
+{% macro monthly_table(rows) -%}
+{% if rows %}
+<table><thead><tr><th>접수 월</th><th>접수</th><th>처리 완료</th><th>미완료</th><th>처리 완료율</th></tr></thead><tbody>
+{% for row in rows %}<tr><td>{{ row['기간_연월'] }}</td><td>{{ row['접수 건수'] }}</td><td>{{ row['처리완료 건수'] }}</td><td>{{ row['미완료 건수'] }}</td><td>{{ row['처리완료율'] }}%</td></tr>{% endfor %}
+</tbody></table>
+{% else %}<p class="empty">표시할 데이터가 없습니다.</p>{% endif %}
+{%- endmacro %}
+<section class="page">
+{{ running('종합 현황') }}
+<h1>{{ report.title }}</h1>
+<p class="meta">조회 기간 {{ report.period_range }}<br>선택 조건 {{ report.filter_summary }} · 생성 {{ report.created_at }}</p>
+<nav class="index">목차 · 종합 현황 / 월별 접수 및 처리 / 고객사·설비·부품 / 업무유형별 상세</nav>
+<h2>A/S 종합 현황</h2>
+<div class="metrics">{% for kpi in report.kpis %}<div class="metric">{{ kpi.label }}<strong>{{ kpi.value }}<small>{{ kpi.unit }}</small></strong></div>{% endfor %}</div>
+<ul class="summary">{% for line in report.narrative[:3] %}<li>{{ line }}</li>{% endfor %}</ul>
+<p class="note">처리 완료는 입력 상태가 ‘처리완료’인 접수 건입니다. 처리 완료율은 해당 접수 건 중 완료된 비중이며, 처리 소요시간을 뜻하지 않습니다.</p>
+<h3>월별 접수 및 처리 추이</h3>
+{{ monthly_table(month_pages[0]) }}
+<h3 style="margin-top:5mm">업무유형별 접수 현황</h3>
+<table><thead><tr><th style="width:30%">업무유형</th><th>접수</th><th>전체 비중</th><th>처리 완료</th><th>미완료</th></tr></thead><tbody>
+{% for detail in report.work_type_details.values() %}<tr><td>{{ detail.label }}</td><td>{{ detail.received }}</td><td>{{ detail.share }}%</td><td>{{ detail.completed }}</td><td>{{ detail.incomplete }}</td></tr>{% endfor %}
+</tbody></table>
+</section>
+{% for rows in month_pages[1:] %}
+<section class="page">{{ running('월별 추이 계속') }}<h2>월별 접수 및 처리 추이</h2>{{ monthly_table(rows) }}</section>
+{% endfor %}
+<section class="page">
+{{ running('고객사·설비·부품') }}
+<h2>고객사·설비·부품별 접수 현황</h2>
+<div class="grid">
+<div class="panel"><h3>접수 건수 상위 10개 고객사</h3>{{ bars(report.customers, '고객사') }}</div>
+<div class="panel"><h3>접수 건수 상위 10개 대분류</h3>{{ bars(report.categories, '대분류') }}</div>
+<div class="panel"><h3>접수 건수 상위 10개 고장부품</h3>{{ bars(report.parts, '소분류 (고장부품)') }}</div>
+<div class="panel"><h3>부품 수리·클레임 제조사 상위 10개</h3>{{ bars(report.manufacturers, '제조사') }}</div>
+</div>
+</section>
+{% for details in detail_pages %}
+<section class="page">
+{{ running('업무유형별 상세') }}
+<h2>{{ '업무유형별 상세 현황' if loop.first else '부품 수리·클레임 / VOC 및 기타 접수 현황' }}</h2>
+{% for detail in details %}
+<article class="detail">
+<h3>{{ detail.slide_title }}</h3>
+{% if detail.received %}
+<div class="stats">{% for kpi in detail.kpis %}<span>{{ kpi.label }} <b>{{ kpi.value }}{{ kpi.unit }}</b></span>{% endfor %}</div>
+<div class="grid"><div><div class="subhead">월별 접수 건수</div><div class="months">{% for month in detail.monthly %}<span>{{ month['기간_연월'] }} <b>{{ month['접수 건수'] }}건</b></span>{% endfor %}</div></div>
+<div><div class="subhead">{{ '제조사 상위 5개' if detail.label == '부품 수리·클레임' else '고객사 상위 5개' }}</div>
+{{ bars(report.manufacturers if detail.label == '부품 수리·클레임' else detail.customers, '제조사' if detail.label == '부품 수리·클레임' else '고객사', 5) }}</div></div>
+{% else %}<p class="empty">해당 기간에 접수된 건이 없습니다.</p>{% endif %}
+{% if detail.label == '기타' %}<p class="note">{{ report.other_description }}</p>{% endif %}
+</article>
+{% endfor %}
+</section>
+{% endfor %}
+</body>
+</html>

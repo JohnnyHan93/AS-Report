@@ -1,0 +1,532 @@
+<!doctype html>
+<!-- AS_REPORT_LAYOUT_VERSION: {{ layout_version }} -->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }} - {{ period_label }}</title>
+  <style>
+    :root {
+      --text: #172033;
+      --muted: #64748b;
+      --line: #d9e2ec;
+      --panel: #f8fafc;
+      --surface: #ffffff;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --amber: #f59e0b;
+      --red: #dc2626;
+      --purple: #7c3aed;
+      --cyan: #0891b2;
+      --slate: #475569;
+      --gray: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Malgun Gothic", Arial, sans-serif; color: var(--text); background: #eef2f7; line-height: 1.55; }
+    .page { max-width: 1380px; margin: 0 auto; padding: 28px 28px 56px; }
+    .cover { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid var(--line); border-top: 5px solid var(--blue); border-radius: 8px; padding: 30px; margin-bottom: 18px; }
+    .cover-label { margin: 0 0 6px; color: var(--blue); font-size: 13px; font-weight: 700; }
+    h1 { margin: 0 0 14px; font-size: 32px; letter-spacing: 0; }
+    h2 { margin: 0 0 14px; font-size: 23px; letter-spacing: 0; }
+    h3 { margin: 0 0 8px; font-size: 17px; letter-spacing: 0; }
+    .meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; color: var(--muted); font-size: 13px; }
+    .report-section { margin-top: 18px; }
+    .section-shell { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+    .section-header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+    .section-kicker { margin: 0 0 4px; color: var(--blue); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .section-description { margin: 0; color: var(--muted); font-size: 13px; max-width: 840px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .metric-card { border: 1px solid var(--line); border-left: 4px solid var(--slate); border-radius: 8px; padding: 14px; background: var(--panel); min-height: 96px; }
+    .metric-card--primary, .metric-card--blue { border-left-color: var(--blue); background: #eff6ff; }
+    .metric-card--green { border-left-color: var(--green); background: #ecfdf5; }
+    .metric-card--amber { border-left-color: var(--amber); background: #fffbeb; }
+    .metric-card--red { border-left-color: var(--red); background: #fef2f2; }
+    .metric-card--purple { border-left-color: var(--purple); background: #f5f3ff; }
+    .metric-card--slate { border-left-color: var(--slate); background: #f8fafc; }
+    .metric-label { margin: 0; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .metric-value { margin: 4px 0 0; font-size: 23px; font-weight: 800; line-height: 1.16; overflow-wrap: anywhere; }
+    .metric-card--blue .metric-value, .metric-card--primary .metric-value { color: var(--blue); }
+    .metric-card--green .metric-value { color: var(--green); }
+    .metric-card--amber .metric-value { color: #b45309; }
+    .metric-card--red .metric-value { color: var(--red); }
+    .metric-card--purple .metric-value { color: var(--purple); }
+    .metric-card--slate .metric-value { color: var(--slate); }
+    .metric-detail { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+    .briefing-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; margin-top: 14px; }
+    .briefing-list { margin: 0; padding-left: 20px; color: #334155; }
+    .briefing-list li { margin: 5px 0; }
+    .analysis-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .analysis-card { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px; min-width: 0; }
+    .analysis-card--wide { grid-column: 1 / -1; }
+    .analysis-card-header { margin-bottom: 8px; }
+    .eyebrow { margin: 0 0 3px; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .card-description { margin: 0; color: var(--muted); font-size: 13px; }
+    .chart-slot { width: 100%; min-height: 360px; margin-top: 8px; }
+    .chart-slot .plotly-graph-div { min-height: 320px; }
+    .empty-state, .empty-chart, .empty-table, .no-data { padding: 18px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; color: #9a3412; }
+    .insight-note { margin: 10px 0 0; padding: 10px 12px; border-left: 3px solid var(--blue); background: #f8fafc; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .insight-note strong { color: #1e3a8a; margin-right: 6px; }
+    .table-scroll, .issue-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; margin: 8px 0 18px; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th, .data-table td { border-bottom: 1px solid var(--line); padding: 8px 10px; vertical-align: top; text-align: left; }
+    .data-table th { background: #edf2f7; color: #243b53; font-weight: 700; white-space: nowrap; position: sticky; top: 0; z-index: 1; }
+    .data-table tr:nth-child(even) td { background: #fbfdff; }
+    .data-table td { white-space: nowrap; }
+    .issue-table { min-width: 1500px; table-layout: auto; }
+    .issue-table th, .issue-table td { font-size: 12px; }
+    .issue-table .nowrap-col { white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+    .issue-table .text-col { min-width: 260px; max-width: 360px; white-space: normal; }
+    .issue-table .full-text-col { min-width: 320px; max-width: 520px; white-space: normal; vertical-align: top; }
+    .issue-text-full { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45; max-height: none; }
+    .clamp-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.38; max-height: 3.1em; }
+    .appendix-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .appendix-block { min-width: 0; }
+    .detail-table-block { border: 1px solid var(--line); border-radius: 8px; background: #fff; margin: 12px 0 18px; overflow: hidden; }
+    .detail-table-block summary { cursor: pointer; padding: 12px 14px; font-weight: 700; color: #1e3a8a; background: #f8fafc; border-bottom: 1px solid var(--line); }
+    .detail-table-block summary:hover { background: #eff6ff; }
+    .detail-content { padding: 14px; }
+    .detail-content .metric-grid { margin-bottom: 14px; }
+    .detail-content .table-scroll, .detail-content .issue-table-wrap { margin-bottom: 14px; }
+    .caption { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+    .page-break { break-before: page; }
+    @page { size: A4; margin: 12mm; }
+    @media print {
+      body { background: #fff; }
+      .page { max-width: none; padding: 0; }
+      .cover, .section-shell, .analysis-card, .metric-card { border-radius: 0; }
+      .analysis-card, .metric-card, table { break-inside: avoid; }
+      .table-scroll, .issue-table-wrap { overflow: visible; }
+      .data-table th { position: static; }
+    }
+    @media (max-width: 1120px) {
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .briefing-grid, .analysis-grid, .appendix-grid { grid-template-columns: 1fr; }
+      .analysis-card--wide { grid-column: auto; }
+    }
+    @media (max-width: 760px) {
+      .page { padding: 18px 12px 40px; }
+      .meta, .metric-grid { grid-template-columns: 1fr; }
+      .issue-table { min-width: 1100px; }
+    }
+  </style>
+  <script>{{ plotly_js|safe }}</script>
+</head>
+<body>
+  <main class="page">
+    <section class="cover">
+      <p class="cover-label">A/S 운영 브리핑</p>
+      <h1>{{ title }}</h1>
+      <div class="meta">
+        <div><strong>분석 기간</strong>: {{ period_label }} ({{ start_date }} ~ {{ end_date }})</div>
+        <div><strong>리포트 레이아웃</strong>: {{ layout_version }}</div>
+        <div><strong>생성일시</strong>: {{ generated_at }}</div>
+        <div><strong>Raw 원본</strong>: {{ source_file_name }}</div>
+        <div><strong>분석 입력</strong>: 04. ES_ 이슈사항 보고 단일 Raw</div>
+        <div><strong>보고 기간 기준</strong>: 접수일</div>
+      </div>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">핵심</p>
+          <h2>핵심 브리핑</h2>
+          <p class="section-description">선택 기간의 접수, 처리, 라인 영향, 데이터 상태를 먼저 확인합니다.</p>
+        </div>
+      </div>
+      {% if no_data %}<p class="no-data">분석 대상 기간에 접수된 이슈가 없습니다.</p>{% endif %}
+      <div class="metric-grid">
+        {% for card in dashboard_cards %}
+        <article class="metric-card metric-card--{{ card.tone }}">
+          <p class="metric-label">{{ card.label }}</p>
+          <p class="metric-value">{{ card.value }}</p>
+          <p class="metric-detail">{{ card.detail }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      <div class="briefing-grid">
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">접수 흐름</p>
+            <h3>월별 접수 흐름</h3>
+            <p class="card-description">접수일 기준 월별 접수 흐름입니다.</p>
+          </header>
+          <div class="chart-slot" data-chart-name="monthly-receptions">{{ charts.monthly_count|safe }}</div>
+          <p class="insight-note"><strong>확인 포인트</strong>월별 증감 원인은 이 차트만으로 판단하지 않습니다.</p>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">보고 기준</p>
+            <h3>보고서 읽기 기준</h3>
+          </header>
+          <ul class="briefing-list">
+            <li>모든 기간 집계는 접수일 기준입니다.</li>
+            <li>라인 중단 시간은 입력 건 기준 참고값입니다.</li>
+            <li>반복 검토 후보는 동일 조건 반복 접수 기준의 참고 후보입니다.</li>
+            {% for line in narrative_lines %}
+            {% if loop.index <= 3 %}<li>{{ line }}</li>{% endif %}
+            {% endfor %}
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="report-section section-shell page-break">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">기간 변동</p>
+          <h2>기간 변동</h2>
+          <p class="section-description">현재 기간을 전년 동기 또는 직전 기간과 비교합니다. 사용자 지정 기간은 비교 분석에서 제외됩니다.</p>
+        </div>
+      </div>
+      {% if comparison_note %}<p class="insight-note"><strong>해석 시 주의</strong>{{ comparison_note }}</p>{% endif %}
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header">
+          <p class="eyebrow">Comparison</p>
+          <h3>주요 지표 비교</h3>
+          <p class="card-description">파란색은 현재 기간, 회색은 전년 동기, 주황색은 직전 기간입니다.</p>
+        </header>
+        <div class="chart-slot" data-chart-name="period-comparison">{{ charts.comparison|safe }}</div>
+        <p class="insight-note"><strong>참고 기준</strong>증감은 접수일 기준 집계 결과이며 원인 판단은 별도 확인이 필요합니다.</p>
+      </article>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">집중 영역</p>
+          <h2>집중 발생 영역</h2>
+          <p class="section-description">선택 기간 내 접수 건수가 어느 고객사, 분류, 업무유형, 처리상태에 집중되는지 확인합니다.</p>
+        </div>
+      </div>
+      <div class="analysis-grid">
+        <article class="analysis-card">
+          <header class="analysis-card-header"><p class="eyebrow">Customer</p><h3>고객사 TOP 10</h3><p class="card-description">고객사별 접수 건수 상위 항목입니다.</p></header>
+          <div class="chart-slot" data-chart-name="customer-top10">{{ charts.customer_top10|safe }}</div>
+          <p class="insight-note"><strong>읽는 방법</strong>상위 항목은 선택 기간 접수 건수 기준으로 정렬됩니다.</p>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header"><p class="eyebrow">Category</p><h3>대분류 접수 분포</h3><p class="card-description">대분류 기준 접수 건수 분포입니다.</p></header>
+          <div class="chart-slot" data-chart-name="category-count">{{ charts.category|safe }}</div>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header"><p class="eyebrow">Part</p><h3>소분류 고장부품 TOP 10</h3><p class="card-description">소분류 고장부품 기준 접수 건수 상위 항목입니다.</p></header>
+          <div class="chart-slot" data-chart-name="part-top10">{{ charts.part_top10|safe }}</div>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header"><p class="eyebrow">Composition</p><h3>업무유형 및 처리상태</h3><p class="card-description">업무유형과 처리상태의 구성입니다.</p></header>
+          <div class="chart-slot" data-chart-name="work-type">{{ charts.work_type|safe }}</div>
+          <div class="chart-slot" data-chart-name="status">{{ charts.status|safe }}</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">라인 영향</p>
+          <h2>라인 영향</h2>
+          <p class="section-description">라인 중단 시간은 입력 건 기준 참고값이며, 미입력은 0분으로 간주하지 않았습니다.</p>
+        </div>
+      </div>
+      <div class="analysis-grid">
+        <article class="analysis-card">
+          <header class="analysis-card-header"><p class="eyebrow">Monthly</p><h3>월별 라인 중단 시간</h3><p class="card-description">입력된 라인 중단 시간의 월별 합계입니다.</p></header>
+          <div class="chart-slot" data-chart-name="monthly-downtime">{{ charts.monthly_downtime|safe }}</div>
+          <p class="insight-note"><strong>해석 시 주의</strong>미입력 건은 총 시간에 포함하지 않습니다.</p>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header"><p class="eyebrow">라인 중단 입력값</p><h3>고객사별 라인 중단 시간 TOP 10</h3><p class="card-description">입력 건 기준 고객사별 라인 중단 시간 상위 항목입니다.</p></header>
+          <div class="chart-slot" data-chart-name="customer-downtime">{{ charts.customer_downtime|safe }}</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">처리 상태</p>
+          <h2>처리 상태 요약</h2>
+          <p class="section-description">접수 대비 처리완료 상태를 입력값 기준으로 확인하는 업무 처리 현황입니다. 업무 상태 외 의미를 부여하지 않습니다.</p>
+        </div>
+      </div>
+      <div class="analysis-grid">
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">상태 KPI</p>
+            <h3>접수 대비 처리완료 현황</h3>
+            <p class="card-description">상태 컬럼의 입력값만 사용하며 접수내용이나 조치이력에서 상태를 추론하지 않습니다.</p>
+          </header>
+          {{ legacy_tables.completion_kpi|safe }}
+          <p class="insight-note"><strong>참고 기준</strong>{{ legacy_notes.completion }}</p>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">월별 추이</p>
+            <h3>월별 처리완료 건수</h3>
+            <p class="card-description">선택 기간 내 월별 접수와 처리 상태 입력값을 함께 확인합니다.</p>
+          </header>
+          <div class="chart-slot" data-chart-name="as25-completion-trend">{{ charts.completion_trend|safe }}</div>
+        </article>
+      </div>
+      <details class="detail-table-block">
+        <summary>처리 상태 상세 표 보기</summary>
+        <div class="detail-content">
+          <h3>월별 처리 상태 추이</h3>
+          {{ legacy_tables.monthly_completion_trend|safe }}
+          <h3>미완료/진행 상태 분포</h3>
+          {{ legacy_tables.open_status_breakdown|safe }}
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">클레임 검토</p>
+          <h2>클레임/제조사 검토</h2>
+          <p class="section-description">업무유형이 부품수리/클레임처리인 접수를 Raw 입력값 기준으로 모아 보는 검토용 섹션입니다. 입력값을 검토할 뿐 추가 판단을 확정하지 않습니다.</p>
+        </div>
+      </div>
+      <div class="analysis-grid">
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">요약</p>
+            <h3>클레임/부품수리 입력값 요약</h3>
+            <p class="card-description">유/무상, 제조사, 분류 입력 상태를 함께 확인합니다.</p>
+          </header>
+          {{ legacy_tables.claim_summary|safe }}
+          <p class="insight-note"><strong>해석 시 주의</strong>{{ legacy_notes.claim }}</p>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">제조사</p>
+            <h3>제조사별 접수 TOP 10</h3>
+            <p class="card-description">제조사 입력값 기준의 접수 분포입니다.</p>
+          </header>
+          <div class="chart-slot" data-chart-name="as25-claim-manufacturer">{{ charts.claim_manufacturer|safe }}</div>
+        </article>
+      </div>
+      <details class="detail-table-block">
+        <summary>클레임/제조사 상세 표 보기</summary>
+        <div class="detail-content">
+          <h3>제조사별 접수</h3>
+          {{ legacy_tables.claim_by_manufacturer|safe }}
+          <h3>유/무상 분포</h3>
+          {{ legacy_tables.claim_by_paid_type|safe }}
+          <h3>분류별 접수</h3>
+          {{ legacy_tables.claim_by_part_category|safe }}
+          <h3>상세 접수 목록</h3>
+          {{ legacy_tables.claim_issue_list|safe }}
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">검토 후보</p>
+          <h2>품질 피드백 검토 후보</h2>
+          <p class="section-description">입력값 기준으로 추가 확인이 필요한 후보를 모은 참고 섹션입니다. 표시 항목은 확정 판단이 아닙니다.</p>
+        </div>
+      </div>
+      <div class="analysis-grid">
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">요약</p>
+            <h3>검토 후보 요약</h3>
+            <p class="card-description">클레임/제조사, 미입력 항목, 부품/분류별 접수 현황을 함께 확인합니다.</p>
+          </header>
+          {{ quality_feedback_tables.summary|safe }}
+          <p class="insight-note"><strong>참고 기준</strong>{{ quality_feedback_note }}</p>
+        </article>
+        <article class="analysis-card">
+          <header class="analysis-card-header">
+            <p class="eyebrow">유형별 건수</p>
+            <h3>검토 후보 유형별 건수</h3>
+            <p class="card-description">후보 유형별 관련 건수를 입력값 기준으로 확인합니다.</p>
+          </header>
+          <div class="chart-slot" data-chart-name="as27-quality-feedback-type">{{ charts.quality_feedback_type|safe }}</div>
+        </article>
+      </div>
+      <details class="detail-table-block">
+        <summary>품질 피드백 검토 후보 상세 표 보기</summary>
+        <div class="detail-content">
+          <h3>검토 후보 유형별 건수</h3>
+          {{ quality_feedback_tables.type_summary|safe }}
+          <h3>클레임/제조사 입력 검토 후보</h3>
+          {{ quality_feedback_tables.claim_candidates|safe }}
+          <h3>유/무상/제조사 미입력 검토 후보</h3>
+          {{ quality_feedback_tables.missing_field_candidates|safe }}
+          <h3>부품/분류별 접수 검토 후보</h3>
+          {{ quality_feedback_tables.part_category_candidates|safe }}
+          <h3>이슈 preview</h3>
+          {{ quality_feedback_tables.issue_preview|safe }}
+        </div>
+      </details>
+    </section>
+
+    <section class="report-section section-shell">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">반복 검토</p>
+          <h2>반복 검토 후보</h2>
+          <p class="section-description">동일 조건으로 2건 이상 접수된 참고 후보입니다. 실제 동일 조건 여부는 담당자 확인이 필요합니다.</p>
+        </div>
+      </div>
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header">
+          <p class="eyebrow">후보 순위</p>
+          <h3>반복 검토 후보 TOP 10</h3>
+          <p class="card-description">HTML 메인 표시 {{ repeat_issue_count }}건, 전체 Excel 기준 {{ repeat_issue_total_count }}건입니다.</p>
+        </header>
+        <div class="chart-slot" data-chart-name="repeat-review-candidates">{{ charts.repeat_issues|safe }}</div>
+        <p class="insight-note"><strong>참고 기준</strong>평균/최근 재접수 간격이 표시되는 경우 접수일 기준 참고 지표이며 실제 설비 MTBF를 의미하지 않습니다.</p>
+      </article>
+    </section>
+
+    <section class="report-section section-shell page-break">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">상세 확인</p>
+          <h2>상세 확인 Appendix</h2>
+          <p class="section-description">본문에서 요약한 지표와 차트를 검증할 수 있는 상세 표입니다.</p>
+        </div>
+      </div>
+
+      <h3>세부 지표</h3>
+      <div class="metric-grid">
+        {% for card in dashboard_cards %}
+        <article class="metric-card metric-card--{{ card.tone }}">
+          <p class="metric-label">{{ card.label }}</p>
+          <p class="metric-value">{{ card.value }}</p>
+          <p class="metric-detail">{{ card.detail }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      <details class="detail-table-block">
+        <summary>세부 지표 상세 보기</summary>
+        <div class="detail-content">
+          {% for group in kpi_groups %}
+          {% set group_tone = loop.cycle('blue', 'green', 'amber', 'slate') %}
+          <h3>{{ group.title }}</h3>
+          <div class="metric-grid">
+            {% for item in group["items"] %}
+            <article class="metric-card metric-card--{{ group_tone }}"><p class="metric-label">{{ item.label }}</p><p class="metric-value">{{ item.value }}</p></article>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </details>
+
+      <h3>기간 비교 상세</h3>
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header"><p class="eyebrow">기간 비교</p><h3>기간 비교 상세 차트</h3><p class="card-description">현재 기간, 전년 동기, 직전 기간 값을 같은 기준으로 표시합니다.</p></header>
+        <div class="chart-slot" data-chart-name="appendix-comparison">{{ charts.appendix_comparison|safe }}</div>
+      </article>
+      <details class="detail-table-block">
+        <summary>기간 비교 상세 표 보기</summary>
+        <div class="detail-content">{{ comparison_table|safe }}</div>
+      </details>
+
+      <h3>반복 검토 후보 상세</h3>
+      <details class="detail-table-block">
+        <summary>반복 검토 후보 상세 표 보기</summary>
+        <div class="detail-content">{{ repeat_issues_table|safe }}</div>
+      </details>
+
+      <h3>고객사 상세</h3>
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header"><p class="eyebrow">고객사</p><h3>고객사 상세 TOP 10</h3><p class="card-description">고객사별 접수 건수 상위 항목입니다.</p></header>
+        <div class="chart-slot" data-chart-name="appendix-customer-top10">{{ charts.appendix_customer_top10|safe }}</div>
+      </article>
+      <details class="detail-table-block">
+        <summary>고객사 상세 표 보기</summary>
+        <div class="detail-content appendix-grid">
+          <div class="appendix-block"><h3>고객사별 접수 건수 TOP 20</h3>{{ tables['고객사별 접수 건수 TOP 20']|safe }}</div>
+          <div class="appendix-block"><h3>고객사별 라인 중단 시간 TOP 20</h3>{{ tables['고객사별 라인 중단 시간 TOP 20']|safe }}</div>
+        </div>
+      </details>
+
+      <h3>설비/장비 상세</h3>
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header"><p class="eyebrow">설비/장비</p><h3>설비/장비 상세 TOP 10</h3><p class="card-description">소분류 고장부품 또는 대분류 기준 상위 항목입니다.</p></header>
+        <div class="chart-slot" data-chart-name="appendix-equipment-top10">{{ charts.appendix_equipment_top10|safe }}</div>
+      </article>
+      <details class="detail-table-block">
+        <summary>설비/장비 상세 표 보기</summary>
+        <div class="detail-content appendix-grid">
+          <div class="appendix-block"><h3>대분류별 접수 건수</h3>{{ tables['대분류별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>중분류별 접수 건수</h3>{{ tables['중분류별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>소분류 고장부품별 접수 건수 TOP 20</h3>{{ tables['소분류 고장부품별 접수 건수 TOP 20']|safe }}</div>
+          <div class="appendix-block"><h3>로보트 기종별 접수 건수</h3>{{ tables['로보트 기종별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>BOOTH별 접수 건수</h3>{{ tables['BOOTH별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>LINE별 접수 건수</h3>{{ tables['LINE별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>공정별 접수 건수</h3>{{ tables['공정별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>고장원인별 접수 건수</h3>{{ tables['고장원인별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>대분류별 라인 중단 시간</h3>{{ tables['대분류별 라인 중단 시간']|safe }}</div>
+          <div class="appendix-block"><h3>소분류 고장부품별 라인 중단 시간 TOP 20</h3>{{ tables['소분류 고장부품별 라인 중단 시간 TOP 20']|safe }}</div>
+        </div>
+      </details>
+
+      <h3>월별/업무유형 상세</h3>
+      <details class="detail-table-block">
+        <summary>월별 및 업무유형 상세 표 보기</summary>
+        <div class="detail-content appendix-grid">
+          <div class="appendix-block"><h3>월별 접수 건수</h3>{{ tables['월별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>월별 라인 중단 시간</h3>{{ tables['월별 라인 중단 시간']|safe }}</div>
+          <div class="appendix-block"><h3>업무유형구분별 접수 건수</h3>{{ tables['업무유형구분별 접수 건수']|safe }}</div>
+          <div class="appendix-block"><h3>상태별 접수 건수</h3>{{ tables['상태별 접수 건수']|safe }}</div>
+        </div>
+      </details>
+
+      <h3>상세 이슈 목록</h3>
+      <details class="detail-table-block">
+        <summary>상세 이슈 목록 보기</summary>
+        <div class="detail-content">
+          <p class="caption">HTML 화면에서는 *ID를 제외하고, 긴 요약 텍스트는 2줄까지만 표시합니다.</p>
+          {{ tables['라인 중단 시간 TOP 20 이슈 목록']|safe }}
+        </div>
+      </details>
+
+      <h3>미완료 이슈</h3>
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header"><p class="eyebrow">미완료</p><h3>미완료 이슈 요약</h3><p class="card-description">미완료 이슈 목록에서 사용 가능한 기준으로 요약한 차트입니다.</p></header>
+        <div class="chart-slot" data-chart-name="appendix-open-issues">{{ charts.appendix_open_issues|safe }}</div>
+      </article>
+      <details class="detail-table-block">
+        <summary>미완료 이슈 상세 표 보기</summary>
+        <div class="detail-content">
+          <p class="caption">총 {{ issue_counts.open }}건입니다. HTML 화면에서는 *ID를 제외하고, 긴 요약 텍스트는 2줄까지만 표시합니다.</p>
+          {{ tables['진행중/미완료 이슈 목록']|safe }}
+        </div>
+      </details>
+
+      <h3>Raw 데이터 품질 상태</h3>
+      <article class="analysis-card analysis-card--wide">
+        <header class="analysis-card-header"><p class="eyebrow">Raw 품질</p><h3>Raw 품질 요약</h3><p class="card-description">Raw 품질 검증 summary 값을 표시용으로 요약한 차트입니다.</p></header>
+        <div class="chart-slot" data-chart-name="appendix-raw-quality">{{ charts.appendix_raw_quality|safe }}</div>
+      </article>
+      <details class="detail-table-block">
+        <summary>Raw 품질 상세 보기</summary>
+        <div class="detail-content">
+          <div class="metric-grid">
+            {% for card in raw_quality_cards %}
+            <article class="metric-card metric-card--slate"><p class="metric-label">{{ card.label }}</p><p class="metric-value">{{ card.value }}</p></article>
+            {% endfor %}
+          </div>
+          <p class="caption">상세 Raw 품질 검증 결과는 별도 Raw 데이터 품질 Markdown/Excel/CSV 산출물을 참조하십시오.</p>
+        </div>
+      </details>
+    </section>
+  </main>
+  <script>
+    window.addEventListener("load", function () {
+      document.querySelectorAll(".plotly-graph-div").forEach(function (el) {
+        if (window.Plotly && el.offsetParent !== null) {
+          window.Plotly.Plots.resize(el);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

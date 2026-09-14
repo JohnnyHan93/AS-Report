@@ -1,0 +1,13 @@
+{
+  "font": "맑은 고딕",
+  "blue": "005B9F",
+  "ink": "18344E",
+  "light": "EFF5F8",
+  "ppt_layout": "자유형",
+  "ppt_rows": 8,
+  "ppt_table_limit": 8,
+  "repeat_column_widths": [2.4, 5.0, 0.8, 2.0, 2.0],
+  "ppt_title_size": 26,
+  "ppt_body_size": 16,
+  "docx_body_size": 10
+}
