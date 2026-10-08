@@ -1,3 +1,5 @@
+> **연구소 인계 · 2026-10-08**: [개발 자료·설계·과거 검증 목록](docs/README.md)을 먼저 확인하십시오. 최신 CSV 점검 모듈은 REVIEW이며 UI 연결·새 CS/애프터마켓 PDF·Excel 완성이나 운영 배포를 뜻하지 않습니다. 실제 고객 입력·보고서는 저장소에 없습니다.
+
 # A/S 리포트 도구
 
 ES 이슈사항 보고 CSV를 기간별로 분석하고, 회사 DY 16:9 양식을 적용한 PPT와 PDF를 내려받는 Windows용 Streamlit 도구입니다.
@@ -159,4 +161,4 @@ C:\Users\johnny\AS report_archive\AS_report_history_20260902.zip
 
 ## GitHub와 로컬 입력
 
-GitHub에는 소스, 테스트, 기본 템플릿과 공용 문서를 저장합니다. `data/`, `config/`, `reports/`, `.venv/`, `tmp/` 및 과거 handoff는 `.gitignore`로 제외합니다. 새 clone에는 실제 업무 입력과 사용자 표준명 설정이 없으므로 승인된 로컬 입력을 별도로 준비해야 합니다. 실제 데이터를 테스트 fixture나 소스에 붙여 넣지 않습니다. 보존된 과거 완료보고서는 현재 PC의 로컬 증거이며 원격에 없는 경로는 로컬에서 확인합니다.
+GitHub에는 소스, 테스트, 기본 템플릿과 공용 문서를 저장합니다. `data/`, `config/`, `reports/`, `.venv/`, `tmp/` 및 과거 handoff 원본은 `.gitignore`로 제외합니다. 새 clone에는 실제 업무 입력과 사용자 표준명 설정이 없으므로 승인된 로컬 입력을 별도로 준비해야 합니다. 실제 데이터를 테스트 fixture나 소스에 붙여 넣지 않습니다. 설계·과거 완료보고서·인계 목록의 검토된 게시용 사본은 [개발 자료 목록](docs/README.md)에 있습니다. 원본 진단 로그와 실제 산출물은 로컬에만 보존합니다.

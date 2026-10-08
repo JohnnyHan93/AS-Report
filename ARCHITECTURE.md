@@ -1,3 +1,9 @@
+## 2026-10-08 개발 자료 게시 기준
+
+- `input_contract.py`의 `inspect_csv(explicit_path) -> InputInspection`은 독립 입력 점검 API다. 원본 헤더·문자열·행 위치·입력 해시·날짜/열/분석별 가용성을 반환한다. 기존 loader/UI에 연결되지 않았다.
+- CSV 파싱은 격리 Python 프로세스를 사용하며 부모 `csv.field_size_limit`를 바꾸지 않는다. 프로세스 시작과 메모리 복사 비용이 있다.
+- [인계 문서](docs/README.md)에 현재 설계와 과거 증거를 분리했다. 아래 9월 구조 설명은 기존 경로를 설명하며 새 기능 승인 상태는 TASKS를 따른다.
+
 # Architecture
 
 확인일: 2026-09-14. 로컬 소스 정적 확인 기준이며 실행 검증 결과를 의미하지 않는다.

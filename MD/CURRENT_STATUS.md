@@ -1,3 +1,9 @@
+## 2026-10-08 연구소 인계 현황
+
+이번 변경은 전체 개발 자료의 GitHub 게시 준비와 재현성 검증이다. [인계 안내](../docs/README.md)와 [게시 검증](../docs/publication_20261008.md)을 현재 기준으로 사용한다. 아래 9월 실행 기록은 과거 증거이며 이번 실행 결과가 아니다.
+
+ASR-E001은 REVIEW로 유지하며 UI 연결은 미구현이다. CS/애프터마켓 상세 설계와 기존 분석 구현을 구분한다. 현재 PDF는 Edge/Chrome 경로이고 PowerPoint가 필요한 경로는 기존 발표용 PPT다. 대표 pair 차단·Word 시각 검수 미완료는 유지한다.
+
 # A/S Report Current Status
 
 Updated: 2026-09-02
